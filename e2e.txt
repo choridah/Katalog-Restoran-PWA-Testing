@@ -1,0 +1,132 @@
+1. npm install codeceptjs puppeteer --save-dev
+2. npx codeceptjs init
+3. 
+Where are your tests located? e2e/**/*.spec.js
+Pertanyaan berikutnya meminta kita memilih “helpers” yang akan digunakan untuk menjalankan tes. Ada beberapa opsi. Karena kita sudah memasang puppeteer, maka kita pilih saja tawaran puppeteer.
+Berikutnya codecept meminta kita menentukan lokasi penyimpanan hasil tes : “Where should logs, screenshots, and reports to be stored?” Silakan jawab dengan e2e/outputs, karena kita ingin menaruhnya di dalam folder tes E2E.
+Pertanyaan berikutnya adalah pertanyaan terkait localization. Jawablah dengan memilih tawaran English (no localization).
+Codecept akan mengajukan pertanyaan lagi, [Puppeteer] Base url of site to be tested. Kita jawab : http://localhost:8080. Ini adalah alamat dasar dari aplikasi yang akan diuji.
+Show browser window? Tentu iya. Tekan enter.
+Browser viewport size? Langsung saja tekan enter.
+Setelah menjawab pertanyaan-pertanyaan di atas, codecept membuat beberapa folder dan berkas. Sebelum melihat apa yang telah dibuat oleh codecept, kita bisa menjawab pertanyaan berikutnya yang diajukan oleh codecept: Feature which is being tested (ex: account, login, etc). Jawab saja: Liking Movies. 
+Tekan enter. Tekan enter juga untuk pertanyaan berikutnya. 
+Selesai.
+
+4. 
+buka berkas tes E2E pertama kita: 
+e2e/Liking_Movies.spec.js. Berkas tersebut berisikan:
+
+Feature('Liking Movies'); 
+Scenario('test something', ({ I }) => {
+ 
+});
+
+========================
+Kriteria 3.1 : Kompresi Gbr --> FAILED = npm run build --> ERROR pd langkah 3
+========================
+
+1. npm install imagemin-webpack-plugin imagemin-mozjpeg --save-dev
+2. Tulis di webpack.common.js
+const ImageminWebpackPlugin = require('imagemin-webpack-plugin').default;
+const ImageminMozjpeg = require('imagemin-mozjpeg');
+
+3. 
+new ImageminWebpackPlugin({
+    plugins: [
+      ImageminMozjpeg({
+        quality: 50,
+        progressive: true,
+      }),
+    ],
+}),
+
+4. npm run build
+5. npm run start-dev
+
+
+========================
+Kriteria 3.2 : Image Responsive --> FAILED --> gbr hero tdk muncul --> DONE
+========================
+
+Fokus pd --> Oportunity 
+--> properly size images
+
+Steps :
+
+1. npm install sharp --save-dev
+2. create file sharp.js
+3. write on file package.json --> bagian scripts
+"build-image": "node sharp.js",
+
+4. 
+new CopyWebpackPlugin({
+     patterns: [
+       {
+         from: path.resolve(__dirname, 'src/public'),
+         to: path.resolve(__dirname, 'dist'),
+         globOptions: {
+           ignore: ['**/images/**'], // CopyWebpackPlugin mengabaikan berkas yang berada di dalam folder images
+         },
+       },
+     ],
+ }),
+
+5. npm run build
+6. npm run start
+
+========================
+Kriteria 3.3 : Lazy Loading --> Gk tau berhasil atau gk :(
+========================
+
+Fokus pd --> Diagnostics
+--> Minimize main-thread work
+
+Steps:
+
+1. npm install lazysizes
+2. Write on src/index.js
+import 'lazysizes';
+import 'lazysizes/plugins/parent-fit/ls.parent-fit';
+
+3. 
+document.body.innerHTML += `<img src="https://picsum.photos/id/${i}/400/400" alt="dummy images"><br>`;
+Menjadi:
+document.body.innerHTML += `<img class="lazyload" data-src="https://picsum.photos/id/${i}/400/400" alt="dummy images"><br>`;
+
+4. npm run build
+5. npm run start
+
+
+===============
+Bundle Analyzer
+===============
+
+1. npm install
+2. pasang plugin webpack-bundle-analyzer.
+--> npm install webpack-bundle-analyzer --save-dev
+
+3. import di webpack.config.js
+--> const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+4. write on webpack.config.js pd bagian plugins
+--> new BundleAnalyzerPlugin(),
+
+5. npm run build
+6. npm uninstall lodash
+7. npm install lodash.filter
+8. import
+--> import filter from 'lodash.filter';
+
+9. sesuaikan dg ini
+filter(contacts, contactType.value === 'all' ? {} : { type: contactType.value })
+ .forEach(renderContact);
+
+10. 
+
+
+
+
+
+
+
+

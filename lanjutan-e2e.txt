@@ -1,0 +1,73 @@
+Scenario('liking one movie', async ({ I }) => {
+  I.see('Tidak ada film untuk ditampilkan', '.movie-item__not__found');
+ 
+  I.amOnPage('/');
+ 
+  I.seeElement('.movie__title a');
+ 
+  const firstFilm = locate('.movie__title a').first();
+  const firstFilmTitle = await I.grabTextFrom(firstFilm);
+  I.click(firstFilm);
+ 
+  I.seeElement('#likeButton');
+  I.click('#likeButton');
+ 
+  I.amOnPage('/#/like');
+  I.seeElement('.movie-item');
+  const likedFilmTitle = await I.grabTextFrom('.movie__title');
+ 
+  assert.strictEqual(firstFilmTitle, likedFilmTitle);
+});
+
+///////////////////////////
+// ------------------ YUDA
+//////////////////////////
+
+const assert = require('assert');
+ 
+Feature('Liking Restaurants');
+ 
+Before(({ I }) => {
+  I.amOnPage('/#/favorite');
+});
+ 
+const messageText = '';
+ 
+Scenario('showing empty liked restaurants', ({ I }) => {
+  I.seeElement('#restaurant-list');
+  I.see(messageText, '#restaurant-list');
+});
+ 
+Scenario('like and unlike a restaurant', async ({ I }) => {
+ 
+  // like resto
+  I.see(messageText, '#restaurant-list');
+ 
+  I.amOnPage('/');
+ 
+  I.seeElement('#restaurant-list');
+ 
+  const firstResto = locate('.card-title a').first();
+  const firstRestoTitle = await I.grabTextFrom(firstResto);
+  I.click(firstResto);
+ 
+  I.seeElement('#likeButton');
+  I.click('#likeButton');
+ 
+  I.amOnPage('/#/favorite');
+  I.seeElement('#restaurant-list');
+ 
+  const likeRestoTitle = await I.grabTextFrom('.card-title a');
+  assert.strictEqual(firstRestoTitle, likeRestoTitle);
+ 
+  // unlike resto
+  I.click(firstResto);
+ 
+  I.seeElement('#likeButton');
+  I.click('#likeButton');
+ 
+  I.amOnPage('/#/favorite');
+ 
+  const FavoriteMessage = await I.grabTextFrom('#restaurant-list');
+  assert.strictEqual(FavoriteMessage, messageText);
+});

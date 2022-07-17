@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;500&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.link-skip {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background-color: #bf1722;
+    color: white;
+    padding: 8px;
+    z-index: 100;
+}
+
+.link-skip:focus {
+    top: 0;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    color: #000000;
+    background-color: #DCC793; /*#F9F5ED*/
+}
+
+main {
+    width: 100%;
+    margin: 0;
+}
+
+header{
+    width: 100%;
+}
+
+header div {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    grid-template-rows: 50px;
+    align-items: center;
+    padding: 5px 16px;
+}
+header div #left-bar{
+    display: flex;
+    padding: 0;
+}
+header div .drawer-btn {
+    width: 44px;
+    min-height: 44px;
+    padding: 8px 7px;
+    margin-right: 16px;
+    font-weight: bold;
+    color: #141e16;
+    background-color: transparent;
+    border: 0; 
+    display: none; 
+    cursor: pointer;
+}
+header div img {
+    margin-right: 16px;
+}
+header div nav ul li {
+    list-style: none;
+    display: inline;
+    width: fit-content;
+}
+header div nav ul li a {
+    padding: 16px 24px;
+    text-decoration: none;
+    color: #141e16;
+    width: fit-content;
+    height: 44px;
+}
+@media screen and (max-width: 1200px) {
+    #app-name {
+        font-size: 17px;
+        padding: 11px 0px;
+    }
+    header div {
+        display: grid;
+        grid-template-columns: 70% 30%;
+    }
+    header div .drawer-btn {
+        display: block; 
+    }
+    header div nav {
+        position: fixed;
+        top: 59px;
+        left: 0;
+        background-color: white;
+        min-height: max-content;
+        width: 150px;
+        box-shadow: 4px 3px 15px -3px rgb(0 0 0 / 10%);
+        transform: translateX(-210px);
+        transition: transform 0.3s ease-out;
+        border-top-right-radius: 13px;
+        border-bottom-right-radius: 13px;
+    }
+    header div nav.open {
+        transform: translateX(0);
+    }
+    header div nav ul li,
+    header div nav ul li a {
+        display:block;
+    }
+    header div nav ul li a {
+        padding: 11px 35px;
+        text-decoration: none; 
+        color: #141e16;
+        font-family: "Nunito", sans-serif;
+        width: fit-content;
+        height: 44px;
+    }
+}
+@media screen and (min-width: 1201px) {
+    header div{
+        width: 100%;
+    }
+    header div {
+        display: grid;
+        grid-template-columns: 72% 28%;
+    }
+}
+
+/*
+Footer
+*/
+ 
+footer {
+background-color: white;
+padding: 1em;
+width: 100%;
+text-align: center;
+color: black;
+}

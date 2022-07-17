@@ -1,0 +1,249 @@
+1. npm init --y
+2. npm install @babel/core @babel/preset-env babel-loader copy-webpack-plugin css-loader eslint html-webpack-plugin style-loader webpack webpack-cli webpack-dev-server webpack-merge --save-dev
+3. npm install regenerator-runtime
+4. npx eslint --init
+How would you like to use ESLint? -> To check, find problems, and enforce code style.
+What type of modules does your project use? -> JavaScript modules (import/export).
+Which framework does your project use? -> None of these.
+Does your project use TypeScript? -> N.
+Where does your code run? -> Browser, Node.
+How would you like to define a style for your project? -> Use a popular style guide.
+Which style guide do you want to follow? -> (Anda bebas memilih, sebagai contoh pilih AirBnB).
+What format do you want your config file to be in? -> JSON.
+Would you like to …… (rest of questions) -> Y.
+
+5. tambahkan ini:
+"lint": "eslint ./src" pd script package.json
+6. npm run lint
+7. Tulis ini di file .eslintrrc.json -> menonaktifkan saran tersebut untuk keseluruhan proyek dengan menambahkan rules pada berkas ESLint configuration (.eslintrc.json).
+    "rules": {
+        "no-console": 0
+    } 
+8. buat file: 
+webpack.common.js
+webpack.dev.js
+webpack.prod.js
+
+9. agar proyek dpt dijalankan menggunakan webpack
+tuls di bagian script pd package.json
+"start-dev": "webpack-dev-server --config webpack.dev.js",
+"build": "webpack --config webpack.prod.js"
+
+10. buat file index.js di src->scripts
+11. buat file index.html di src->templates
+12. ubah contentBase dengan static
+    devServer: {
+        static: path.resolve(__dirname, 'dist'),
+    }
+13. buat tampilan html utk body
+14. buat style.css & responsive.css
+15. buat file views->app.js
+16. buat file utils->drawer-initiator.js
+17. import file2 yg dibuat di index.js & buat fungsi app
+18. buat file pages->detail.js, upcoming.js, now-playing.js
+19. buat file routes->routes.js, url-parser.js
+20. import file baru yg dibuat & buat fungsi renderpage (di scripts/views/app.js)
+21. buat fungsi window.addEventListener (di scripts/index.js)
+22. buat file di folder globals & data
+
+
+// lanjut ke materi : WEB APP MANIFEST
+
+1. buat file src/public/manifest.json
+2. daftarkan berkas manifest.json pada index.html. 
+    Silakan buka src -> templates -> index.html, di dalam <head> 
+--> Tulis:
+    <link rel="manifest" href="manifest.json">
+3. agar aplikasi tampilan website lebih bagus lagi 
+    ketika diakses oleh browser di perangkat mobile, 
+    kita dapat menerapkan warna tema pada address bar browser mobile, 
+    dengan menambahkan meta tag berikut di dalam <head>.
+--> Tulis :
+    <meta name="theme-color" content="#db0000"/>
+4. Untuk perangkat mobile iOS kita juga dapat melakukan optimasi icon dengan menambahkan tag link berikut:
+---> Tulis:
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+
+    WARNING!
+    Tetapkan icon berekstensi PNG, dengan ukuran 192x192px 
+    serta pastikan icon tidak memiliki background transparan.
+
+
+// lanjut ke materi : SERVICE WORKER
+
+1. npm install serviceworker-webpack-plugin
+--> untuk menciptakan runtime yang dapat diakses oleh service worker. 
+    Selain itu terdapat benefit lain bila menggunakan plugin ini, 
+    seperti tak perlu menuliskan daftar aset statis secara manual.
+2. Tulis di webpack.common.js:
+const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin');
+bagian plugins tulis:
+new ServiceWorkerWebpackPlugin({
+    entry: path.resolve(__dirname, 'src/scripts/sw.js'),
+}),
+3. buat file sw.js di folder src/scripts/sw.js
+4. buat file sw-register.js di folder src/scripts/utils/sw-register.js
+--> registrasikan service worker yang sudah dibuat pada browser.
+5. Memanggil fungsi swRegister pd entry point.
+    didalam callback event load.
+--> Tulis di src/scripts/index.js: 
+    swRegister();
+6. Don't Write this on webpack.dev.js:
+  devServer: {
+    static: path.resolve(__dirname, 'dist'),
+  },
+
+
+// lanjut ke materi : CACHE API
+
+1. buat file src/scripts/utils/cache-helper.js
+2. Dalam melakukan caching di service worker, 
+    kita membutuhkan tiga kasus sesuai TODO yang sudah kita tandai pada tiap event-nya. 
+    Yang pertama adalah caching app shell, yang kedua menghapus cache lama, 
+    dan yang ketiga memasukkan atau menambahkan fetch request ke caches 
+    menggunakan teknik stale while revalidate. 
+--> Tulis logika catching di cache-helper.js
+3. Kita mulai dari fungsi cachingAppShell terlebih dahulu. 
+    Fungsi tersebut membutuhkan satu parameter
+    yakni kumpulan url dari berkas pembentuk app shell.
+    Bisa itu favicon, icons, index.html, bundle.js, dan lain-lain. 
+    Untuk memasukkan banyak url sekaligus pada cache 
+    kita bisa manfaatkan cache.addAll(), 
+    namun sebelum itu kita perlu membuka/membuat caches yang dituju. Buatlah fungsi baru dengan nama _openCache() yang berfungsi untuk membuka cache yang diinginkan.
+--> Tulis
+    async _openCache() {
+        return caches.open('MovieCatalogue-V1');
+    },
+4. Setelah itu, di dalam fungsi cachingAppShell() 
+--> Tulis
+    async cachingAppShell(requests) {
+        const cache = await this._openCache();
+        cache.addAll(requests);
+    },
+5. Lanjut untuk fungsi deleteOldCache, 
+    fungsi ini bertujuan untuk menghapus cache lama 
+    yang sudah tidak diperlukan. Tuliskan kode berikut:
+--> Tulis
+    async deleteOldCache() {
+        const cacheNames = await caches.keys();
+        cacheNames
+            .filter((name) => name !== 'MovieCatalogue-V1')
+            .map((filteredName) => caches.delete(filteredName));
+    },
+6. Kita lanjut lengkapi fungsi revalidateCache(). 
+    Fungsi ini membutuhkan fungsi kecil lain 
+    yakni melakukan fetch request dan memasukkan request ke dalam cache. 
+    Sehingga buat dulu dua fungsi _fetchRequest() dan _addCache()
+7. Kemudian kita lengkapi fungsi revalidateCache 
+--> Tulis   
+    async revalidateCache(request) {
+        const response = await caches.match(request);
+        
+        if (response) {
+            this._fetchRequest(request);
+            return response;
+        }
+        return this._fetchRequest(request);
+    },
+8. tulis kode dibawah ke src/scripts/globals/config.js
+--> Tulis
+    CACHE_NAME: 'MovieCatalogue-V1',
+9. import config.js di cache-helper.js 
+
+
+// lanjut ke materi : INDEXED-DB --> Menyiapkan Fungsi operations
+
+1. tulis kode ini di config.js
+--> Tulis
+    CACHE_NAME: new Date().toISOString(),
+    DATABASE_NAME: 'movie-catalogue-database',
+    DATABASE_VERSION: 1,
+    OBJECT_STORE_NAME: 'movies',
+2. pasang library idb
+--> Tulis
+    npm install idb
+3. buat file src/scripts/data/favoritemovie-idb.js
+4. Kemudian buat objek database yang di dalamnya 
+    terdapat asynchronous method dalam melakukan 
+    operasi database seperti getMovie, getAllMovies, 
+    putMovie, dan deleteMovie.
+5. lakukan default export pada objek database 
+    agar dapat diakses pada module/berkas JavaScript lain.
+--> Tulis di favoritemovie-idb.js
+    export default FavoriteMovieIdb;
+
+
+// lanjut ke materi : INDEXED-DB --> Menambahkan tombol like
+
+1. Tulis di tag <head>
+    <script src="https://use.fontawesome.com/b070c8f1df.js"></script>
+    atau 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous" />
+2. mengatur styling utk button like
+3. Lanjut kita buat fungsi baru 
+    pada src -> scripts -> views -> templates -> template-creator.js, 
+    yang mengembalikan string HTML dalam membuat tombol like-nya tersebut. 
+    Kita buat dua fungsi, yakni createLikeButtonTemplate dan createLikedButtonTemplate.
+4. export fungsi yg dibuat
+5. pada file pages/detail.js
+--> Tulis
+    <div id="likeButtonContainer"></div>
+6. Tambahkan fungsi pd tag button like dan import createLikeButtoTemplate
+--> Tulis di pages/detail.js
+    const likeButtonContainer = document.querySelector('#likeButtonContainer');
+    likeButtonContainer.innerHTML = createLikeButtonTemplate();
+
+
+// lanjut ke materi : Giving fungsionalitas on button like
+
+1. buat file src/scripts/utils/like-button-initiator.js
+2. modifikasi fungsi afterRender di detail.js
+3. dan import fungsionalitas yg dibuat
+
+
+// lanjut ke materi : Menampilkan data FavoriteMovieIdb
+
+1. buat file src/scripts/views/pages/like.js
+2. daftarkan halaman Like 
+    pada src -> scripts -> routes -> routes.js. 
+    Tetapkan URL-nya dengan -> ‘/like’.
+3. tambahkan menu Like pada navigation di index.html. 
+
+
+// lanjut ke materi : WEB SOCKET
+
+1. buat file src/scripts/utils/websocket-initiator.js
+--> buat objek dengan nama WebSocketInitiator, 
+    jangan lupa lakukan ekspor menggunakan default export.
+--> buat method init dengan parameter URL 
+    yang merupakan alamat dari web socket server.
+--> buat instance WebSocket dengan 
+    menetapkan nilai url di constructornya.
+--> menetapkan callback event onmessage 
+    untuk menampilkan data (sementara ini pada console) 
+    yang dikirimkan dari server ke client secara real time.
+2. buat nilai konstan baru bernama WEB_SOCKET_SERVER 
+    dengan nilai ‘wss://movies-feed.dicoding.dev’. 
+--> Tulis di src/scripts/globals/config.js
+3. unakan WebSocketInitiator 
+    entry point (src -> scripts -> index.js), 
+    lebih tepatnya di dalam event load.
+4. setiap 10 detik sekali, console browser 
+    akan menampilkan data movie yang sedang tayang secara acak.
+
+
+// lanjut ke materi : NOTIFICATION
+
+1. buat file src/scripts/utils/notification-helper.js
+--> buat objek NotificationHelper, dan lakukan ekspor secara default export.
+--> Karena objek NotificationHelper dibuat untuk membantu kita mengirimkan notifikasi, jadi buat fungsi baru bernama sendNotification, tentu fungsi ini membutuhkan title, dan options pada parameternya.
+--> Untuk mengirimkan notifikasi, perlu beberapa tahap yang harus dilewati seperti: 
+Pengecekan apakah browser mendukung notifikasi.
+Pengecekan apakah fitur notifikasi diijinkan. Jika belum, lakukan permohonan perizinan.
+Menampilkan notifikasi.
+--> tuliskan logika untuk mengirimkan notifikasi pada sendNotification.
+2. Terakhir kita ubah penerapan console.log pada websocket-initiator.js dengan menggunakan fungsi NotificationHelper.sendNotification(). Serta sesuaikan nilai-nilai yang didapatkan dari server untuk ditampilkan pada notifikasi.
+3. Bila kita izinkan, maka notifikasi akan muncul tiap 10 detik sekali (sesuai dengan data yang diterima dari web socket).
+
+
+
